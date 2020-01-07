@@ -3,7 +3,7 @@ const path = require('path');
 const sprintf = require('sprintf-js').sprintf;
 const index = require('./index');
 
-var counter = 0;
+// var counter = 0;
 
 // Private helper functions ////////////////////////////////////////////////////
 
@@ -46,19 +46,6 @@ exports.getNextUniqueId = function(callback) {
     num = num + 1;
     writeCounter(num, callback);
   })
-
-  // if (id === 'id') {
-
-  //   readCounter((er, num) => {
-  //     num = num + 1;
-  //     counter = zeroPaddedNumber(num);
-  //   });
-
-  //   return counter;
-
-  // } else if (id.length === 5) {
-  //   writeCounter(id, index.createToDoTxt);
-  // }
 };
 
 

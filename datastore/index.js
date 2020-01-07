@@ -11,12 +11,12 @@ exports.create = (text, callback) => {
   // this will handle POST
   counter.getNextUniqueId((err, id) => {
     items[id] = text;
-    console.log('id:', id, 'items:', items);
-    callback(null, { id, text }); // sends data back to client
     createToDoTxt(id);
+    callback(null, { id, text }); // sends data back to client
   });
 };
 
+// we created this function
 const createToDoTxt = (id) => {
   fs.writeFile(path.join(__dirname, 'data/', `${id}.txt`), items[id], (err) => {
     if (err) {
@@ -27,8 +27,13 @@ const createToDoTxt = (id) => {
 
 exports.readAll = (callback) => {
   fs.readdir(path.join(__dirname, 'data'), (err, files) => {
-    console.log('list', files);
+    if (err) {
+      throw ('error reading all files', err);
+    }
     var data = _.map(files, (fileName, i) => {
+      if (files.length === 0) {
+        return;
+      }
       let name = fileName.split('.')[0]
       return { id: name, text: name };
     });
@@ -36,34 +41,48 @@ exports.readAll = (callback) => {
   });
 };
 
+// does readAll make use of readOne???
 exports.readOne = (id, callback) => {
-  var text = items[id];
-  if (!text) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback(null, { id, text });
-  }
+  let filePath = path.join(__dirname, 'data', `${id}.txt`);
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+      throw ('error reading one file', err);
+    } else {
+      callback(null, { id: id, text: data });
+    }
+  });
 };
 
 exports.update = (id, text, callback) => {
-  var item = items[id];
-  if (!item) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    items[id] = text;
-    callback(null, { id, text });
-  }
+  let filePath = path.join(__dirname, 'data', `${id}.txt`);
+  fs.writeFile(filePath, text, (err) => {
+    if (err) {
+      throw ('error updating file', err);
+    } else {
+      callback(null, {id: id, text: text});
+    }
+  });
 };
 
 exports.delete = (id, callback) => {
-  var item = items[id];
-  delete items[id];
-  if (!item) {
-    // report an error if item not found
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback();
-  }
+  let filePath = path.join(__dirname, 'data', `${id}.txt`);
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      throw ('error deleting file', err);
+    } else {
+      callback();
+    }
+  })
+
+
+  // var item = items[id];
+  // delete items[id];
+  // if (!item) {
+  //   // report an error if item not found
+  //   callback(new Error(`No item with id: ${id}`));
+  // } else {
+  //   callback();
+  // }
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
