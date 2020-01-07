@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('underscore');
 const counter = require('./counter');
+const Promise = require('bluebird');
 
 var items = {};
 
@@ -10,15 +11,18 @@ var items = {};
 exports.create = (text, callback) => {
   // this will handle POST
   counter.getNextUniqueId((err, id) => {
-    items[id] = text;
-    createToDoTxt(id);
+    if (err) {
+      callback(err, null);
+    }
+    // items[id] = text;
+    createToDoTxt(id, text);
     callback(null, { id, text }); // sends data back to client
   });
 };
 
 // we created this function
-const createToDoTxt = (id) => {
-  fs.writeFile(path.join(__dirname, 'data/', `${id}.txt`), items[id], (err) => {
+const createToDoTxt = (id, text) => {
+  fs.writeFile(path.join(__dirname, 'data/', `${id}.txt`), text, (err) => {
     if (err) {
       throw ('error creating todo text file');
     }
@@ -26,10 +30,13 @@ const createToDoTxt = (id) => {
 };
 
 exports.readAll = (callback) => {
+
   fs.readdir(path.join(__dirname, 'data'), (err, files) => {
     if (err) {
-      throw ('error reading all files', err);
+      // throw ('error reading all files', err);
+      callback(err, null);
     }
+
     var data = _.map(files, (fileName, i) => {
       if (files.length === 0) {
         return;
@@ -37,7 +44,10 @@ exports.readAll = (callback) => {
       let name = fileName.split('.')[0]
       return { id: name, text: name };
     });
-    callback(null, data); // sends data to client
+
+    Promise.all(data).then(() => {
+      callback(null, data);
+    });
   });
 };
 
