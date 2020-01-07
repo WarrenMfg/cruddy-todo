@@ -17,7 +17,7 @@ exports.create = (text, callback) => {
 };
 
 const createToDoText = (id, text) => {
-  let todoItemPath = path.join(__dirname, id.toString());
+  let todoItemPath = path.join(__dirname, id);
   fs.writeFile(todoItemPath, text, (err) => {
     if (err) {
       throw ('error writing todo item');
