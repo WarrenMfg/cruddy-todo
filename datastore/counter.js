@@ -3,7 +3,7 @@ const path = require('path');
 const sprintf = require('sprintf-js').sprintf;
 const index = require('./index');
 
-var counter = 0;
+// var counter = 0;
 
 // Private helper functions ////////////////////////////////////////////////////
 
@@ -16,8 +16,8 @@ const zeroPaddedNumber = (num) => {
   return sprintf('%05d', num);
 };
 
-const readCounter = async (callback) => {
-  fs.readFile(exports.counterFile, (err, fileData) => {
+const readCounter = (callback) => {
+  fs.readFile(exports.counterFile, 'utf8', (err, fileData) => {
     if (err) {
       callback(null, 0);
     } else {
@@ -40,11 +40,13 @@ const writeCounter = (count, callback) => {
 
 
 // Public API - Fix this function //////////////////////////////////////////////
-exports.getNextUniqueId = async (err, id) => {
+exports.getNextUniqueId = async function(err, id) {
+  let counter = 0;
 
   if (id === 'id') {
-    await readCounter((err, num) => counter = num);
-    counter = counter + 1;
+    await readCounter(function(err, num) {
+      counter = num + 1;
+    });
     return zeroPaddedNumber(counter);
   } else if (id.length === 5) {
     writeCounter(id, index.createToDoTxt);

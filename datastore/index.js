@@ -11,6 +11,7 @@ exports.create = async (text, callback) => {
   // this will handle POST
   var id = await counter.getNextUniqueId(null, 'id');
   items[id] = text;
+  console.log('items', items);
   callback(null, { id, text }); // sends data back to client
 
   // this will handle server stuff
@@ -19,7 +20,6 @@ exports.create = async (text, callback) => {
 
 
 exports.createToDoTxt = (err, id) => {
-  console.log('id', id)
   fs.writeFile(path.join(__dirname, 'data/', `${id}.txt`), items[id], (err) => {
     if (err) {
       throw ('error creating todo text file');
@@ -28,8 +28,8 @@ exports.createToDoTxt = (err, id) => {
 };
 
 exports.readAll = (callback) => {
+  console.log(items);
   var data = _.map(items, (text, id) => {
-    console.log('READALL', id, text);
     return { id: id, text: id };
   });
   callback(null, data); // sends data to client
