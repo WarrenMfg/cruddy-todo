@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const sprintf = require('sprintf-js').sprintf;
+const index = require('./index');
 
 var counter = 0;
 
@@ -23,8 +24,8 @@ exports.readCounter = (callback) => {
       callback(null, Number(fileData));
     }
   });
-
-};
+  // code here continues to run
+}; // implicit return of undefined
 
 const writeCounter = (count, callback) => {
   var counterString = zeroPaddedNumber(count);
@@ -39,14 +40,21 @@ const writeCounter = (count, callback) => {
 
 // Public API - Fix this function //////////////////////////////////////////////
 const identity = (err, val) => {
-  console.log('IDENTITY', typeof val);
   return val;
 };
 
 exports.getNextUniqueId = (err, id) => {
-  console.log('GETNEXTUNIQUEID:', err, id);
-  id = id + 1;
-  writeCounter(id, identity);
+
+  if (arguments[0] === 'id') {
+    counter = counter + 1;
+    return zeroPaddedNumber(counter);
+  } else if (arguments[0].length === 5) {
+    readFile(getNextUniqueId);
+  } else {
+    id = id + 1;
+    writeCounter(id, index.createToDoText);
+  }
+
   // return zeroPaddedNumber(counter);
 };
 

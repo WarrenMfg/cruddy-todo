@@ -8,13 +8,27 @@ var items = {};
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 
 exports.create = (text, callback) => {
-  var id = counter.readCounter(counter.getNextUniqueId);
-  console.log('ID INSIDE CREATE', id)
+  // this will handle POST
+  var id = counter.getNextUniqueId('id');
+  console.log('create id', id);
   items[id] = text;
-  // create
-  createToDoText(id, text);
-  callback(null, { id, text }); // ES6; obj sent to client
+  callback(null, { id, text });
+
+  // this will handle server stuff
+  // counter.readCounter(counter.getNextUniqueId);
+  counter.getNextUniqueId(id); // padded id
 };
+
+
+exports.createToDoText = (no, id) => {
+  fs.writeFile(path.join(__dirname, 'data/', `${id}.txt`), items[id], (err) => {
+    if (err) {
+      throw ('error creating todo text file');
+    }
+  });
+};
+
+// callback(null, { id, text }); // ES6; obj sent to client
 
 const createToDoText = (id, text) => {
   let todoItemPath = path.join(__dirname, id);
