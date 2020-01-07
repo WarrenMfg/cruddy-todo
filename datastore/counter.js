@@ -3,7 +3,7 @@ const path = require('path');
 const sprintf = require('sprintf-js').sprintf;
 const index = require('./index');
 
-// var counter = 0;
+var counter = 0;
 
 // Private helper functions ////////////////////////////////////////////////////
 
@@ -28,31 +28,37 @@ const readCounter = (callback) => {
 }; // implicit return of undefined
 
 const writeCounter = (count, callback) => {
-  // var counterString = zeroPaddedNumber(count);
-  fs.writeFile(exports.counterFile, count, (err) => {
+  var counterString = zeroPaddedNumber(count);
+  fs.writeFile(exports.counterFile, counterString, (err) => {
     if (err) {
       throw ('error writing counter');
     } else {
-      callback(null, count);
+      callback(null, counterString);
     }
   });
 };
 
 
 // Public API - Fix this function //////////////////////////////////////////////
-exports.getNextUniqueId = async function(err, id) {
-  let counter = 0;
+exports.getNextUniqueId = function(callback) {
 
-  if (id === 'id') {
-    await readCounter(function(err, num) {
-      counter = num + 1;
-    });
-    return zeroPaddedNumber(counter);
-  } else if (id.length === 5) {
-    writeCounter(id, index.createToDoTxt);
-  }
+  readCounter((err, num) => {
+    num = num + 1;
+    writeCounter(num, callback);
+  })
 
-  // return zeroPaddedNumber(counter);
+  // if (id === 'id') {
+
+  //   readCounter((er, num) => {
+  //     num = num + 1;
+  //     counter = zeroPaddedNumber(num);
+  //   });
+
+  //   return counter;
+
+  // } else if (id.length === 5) {
+  //   writeCounter(id, index.createToDoTxt);
+  // }
 };
 
 

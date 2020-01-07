@@ -7,19 +7,17 @@ var items = {};
 
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 
-exports.create = async (text, callback) => {
+exports.create = (text, callback) => {
   // this will handle POST
-  var id = await counter.getNextUniqueId(null, 'id');
-  items[id] = text;
-  console.log('items', items);
-  callback(null, { id, text }); // sends data back to client
-
-  // this will handle server stuff
-  counter.getNextUniqueId(null, id); // padded id string
+  counter.getNextUniqueId((err, id) => {
+    items[id] = text;
+    console.log('id:', id, 'items:', items);
+    callback(null, { id, text }); // sends data back to client
+    createToDoTxt(id);
+  });
 };
 
-
-exports.createToDoTxt = (err, id) => {
+const createToDoTxt = (id) => {
   fs.writeFile(path.join(__dirname, 'data/', `${id}.txt`), items[id], (err) => {
     if (err) {
       throw ('error creating todo text file');
@@ -28,11 +26,14 @@ exports.createToDoTxt = (err, id) => {
 };
 
 exports.readAll = (callback) => {
-  console.log(items);
-  var data = _.map(items, (text, id) => {
-    return { id: id, text: id };
+  fs.readdir(path.join(__dirname, 'data'), (err, files) => {
+    console.log('list', files);
+    var data = _.map(files, (fileName, i) => {
+      let name = fileName.split('.')[0]
+      return { id: name, text: name };
+    });
+    callback(null, data); // sends data to client
   });
-  callback(null, data); // sends data to client
 };
 
 exports.readOne = (id, callback) => {
