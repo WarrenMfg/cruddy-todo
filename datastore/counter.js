@@ -16,7 +16,7 @@ const zeroPaddedNumber = (num) => {
   return sprintf('%05d', num);
 };
 
-exports.readCounter = (callback) => {
+const readCounter = (callback) => {
   fs.readFile(exports.counterFile, (err, fileData) => {
     if (err) {
       callback(null, 0);
@@ -38,19 +38,17 @@ const writeCounter = (count, callback) => {
   });
 };
 
-// Public API - Fix this function //////////////////////////////////////////////
-const identity = (err, val) => {
-  return val;
-};
 
+// Public API - Fix this function //////////////////////////////////////////////
 exports.getNextUniqueId = (err, id) => {
 
-  if (arguments[0] === 'id') {
+  if (id === 'id') {
     counter = counter + 1;
     return zeroPaddedNumber(counter);
-  } else if (arguments[0].length === 5) {
-    readFile(getNextUniqueId);
+  } else if (id.length === 5) {
+    readCounter(exports.getNextUniqueId);
   } else {
+    console.log('ABOUT TO WRITECOUNTER', id);
     id = id + 1;
     writeCounter(id, index.createToDoText);
   }
