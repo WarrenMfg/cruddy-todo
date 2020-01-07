@@ -16,7 +16,7 @@ const zeroPaddedNumber = (num) => {
   return sprintf('%05d', num);
 };
 
-const readCounter = (callback) => {
+const readCounter = async (callback) => {
   fs.readFile(exports.counterFile, (err, fileData) => {
     if (err) {
       callback(null, 0);
@@ -28,29 +28,26 @@ const readCounter = (callback) => {
 }; // implicit return of undefined
 
 const writeCounter = (count, callback) => {
-  var counterString = zeroPaddedNumber(count);
-  fs.writeFile(exports.counterFile, counterString, (err) => {
+  // var counterString = zeroPaddedNumber(count);
+  fs.writeFile(exports.counterFile, count, (err) => {
     if (err) {
       throw ('error writing counter');
     } else {
-      callback(null, counterString);
+      callback(null, count);
     }
   });
 };
 
 
 // Public API - Fix this function //////////////////////////////////////////////
-exports.getNextUniqueId = (err, id) => {
+exports.getNextUniqueId = async (err, id) => {
 
   if (id === 'id') {
+    await readCounter((err, num) => counter = num);
     counter = counter + 1;
     return zeroPaddedNumber(counter);
   } else if (id.length === 5) {
-    readCounter(exports.getNextUniqueId);
-  } else {
-    console.log('ABOUT TO WRITECOUNTER', id);
-    id = id + 1;
-    writeCounter(id, index.createToDoText);
+    writeCounter(id, index.createToDoTxt);
   }
 
   // return zeroPaddedNumber(counter);

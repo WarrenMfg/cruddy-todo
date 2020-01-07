@@ -7,19 +7,19 @@ var items = {};
 
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 
-exports.create = (text, callback) => {
+exports.create = async (text, callback) => {
   // this will handle POST
-  var id = counter.getNextUniqueId(null, 'id');
+  var id = await counter.getNextUniqueId(null, 'id');
   items[id] = text;
-  callback(null, { id, text });
+  callback(null, { id, text }); // sends data back to client
 
   // this will handle server stuff
   counter.getNextUniqueId(null, id); // padded id string
 };
 
 
-exports.createToDoText = (err, id) => {
-  console.log('ITEMS', items)
+exports.createToDoTxt = (err, id) => {
+  console.log('id', id)
   fs.writeFile(path.join(__dirname, 'data/', `${id}.txt`), items[id], (err) => {
     if (err) {
       throw ('error creating todo text file');
