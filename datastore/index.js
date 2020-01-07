@@ -8,9 +8,21 @@ var items = {};
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 
 exports.create = (text, callback) => {
-  var id = counter.getNextUniqueId();
+  var id = counter.readCounter(counter.getNextUniqueId);
+  console.log('ID INSIDE CREATE', id)
   items[id] = text;
-  callback(null, { id, text });
+  // create
+  createToDoText(id, text);
+  callback(null, { id, text }); // ES6; obj sent to client
+};
+
+const createToDoText = (id, text) => {
+  let todoItemPath = path.join(__dirname, id.toString());
+  fs.writeFile(todoItemPath, text, (err) => {
+    if (err) {
+      throw ('error writing todo item');
+    }
+  });
 };
 
 exports.readAll = (callback) => {
