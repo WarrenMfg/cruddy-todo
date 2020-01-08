@@ -3,50 +3,57 @@ const path = require('path');
 const _ = require('underscore');
 const counter = require('./counter');
 const Promise = require('bluebird');
+const readFilePromise = Promise.promisify(fs.readFile);
 
-var items = {};
+// var items = {};
 
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 
 exports.create = (text, callback) => {
   // this will handle POST
   counter.getNextUniqueId((err, id) => {
-    if (err) {
-      callback(err, null);
-    }
-    // items[id] = text;
-    createToDoTxt(id, text);
-    callback(null, { id, text }); // sends data back to client
+    // if (err) {
+    //   callback(err, null);
+    // }
+    // createToDoTxt(id, text);
+    fs.writeFile(path.join(__dirname, 'data', `${id}.txt`), text, (err) => {
+      if (err) {
+        throw ('error creating todo text file');
+      } else {
+        callback(null, { id, text }); // sends data back to client
+      }
+    });
   });
 };
 
 // we created this function
-const createToDoTxt = (id, text) => {
-  fs.writeFile(path.join(__dirname, 'data/', `${id}.txt`), text, (err) => {
-    if (err) {
-      throw ('error creating todo text file');
-    }
-  });
-};
+// const createToDoTxt = (id, text) => {
+
+// };
 
 exports.readAll = (callback) => {
 
   fs.readdir(path.join(__dirname, 'data'), (err, files) => {
     if (err) {
-      // throw ('error reading all files', err);
-      callback(err, null);
+      return callback(err, null);
     }
 
-    var data = _.map(files, (fileName, i) => {
-      if (files.length === 0) {
+    var data = _.map(files, (file, i) => {
+      if (files.length === 0) { // does this help pass test?
         return;
       }
-      let name = fileName.split('.')[0]
-      return { id: name, text: name };
+
+      let name = file.split('.')[0]
+      return readFilePromise(path.join(__dirname, 'data', file)).then(contents => {
+        return {
+          id: name,
+          text: contents.toString()
+        } });
     });
 
-    Promise.all(data).then(() => {
-      callback(null, data);
+    // to return future values
+    Promise.all(data).then((todos) => {
+      callback(null, todos);
     });
   });
 };
